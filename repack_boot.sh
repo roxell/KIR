@@ -102,7 +102,7 @@ case ${TARGET} in
 	new_file_name=$(get_new_file_name "${LXC_ROOTFS_FILE}" ".new.rootfs")
 	new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
 	if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-		get_and_create_a_ddfile "${new_file_name}" "${new_size}"
+		get_and_create_a_ddfile "${new_file_name}" "${new_size}" "1M" 60 "ext4"
 	else
 		new_file_name=$(basename "${LXC_ROOTFS_FILE}" .gz)
 		get_and_create_new_rootfs "${new_file_name}" "${new_file_name}" "${new_size}"

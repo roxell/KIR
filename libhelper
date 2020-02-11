@@ -70,8 +70,16 @@ get_new_size() {
 get_and_create_a_ddfile() {
 	local local_new_file_name=${1}
 	local local_new_size=${2}
-	dd if=/dev/zero of="${local_new_file_name}" bs=1M count=60 seek="${local_new_size}"
-	mkfs.ext4 "${local_new_file_name}"
+	local local_bs=${3}
+	local local_count=${4}
+	local local_format=${5}
+	dd if=/dev/zero of="${local_new_file_name}" bs=${local_bs} count=${local_count} seek="${local_new_size}"
+	if [[ ${local_format} = *"fat -F"* ]]; then
+		/sbin/parted --script ${local_new_file_name} mklabel msdos
+		/sbin/parted --script ${local_new_file_name} mkpart p fat32 0 ${local_bs}
+		/sbin/parted --script ${local_new_file_name} set 1 boot
+	fi
+	mkfs.${local_format} "${local_new_file_name}"
 }
 
 get_and_create_new_rootfs() {
