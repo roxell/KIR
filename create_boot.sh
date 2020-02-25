@@ -14,7 +14,6 @@ else
 fi
 
 
-new_size="1M"
 new_file_name=x15_u-boot.img
 
 usage() {
@@ -44,7 +43,7 @@ done
 LXC_MLO_FILE=$(curl_me "${LXC_MLO_URL}")
 LXC_UBOOT_FILE=$(curl_me "${LXC_UBOOT_URL}")
 
-get_and_create_a_ddfile "${new_file_name}" "${new_size}" "48" "0" "fat -F 16"
+get_and_create_a_ddfile "${new_file_name}" "1M" "48" "0" "fat -F 16"
 
 mount_point_dir=$(get_mountpoint_dir)
 
