@@ -71,7 +71,7 @@ fi
 
 
 if [[ -n ${nfsrootfs} ]]; then
-	rpb-console-rootfs-lkft.
+	#rpb-console-rootfs-lkft.
 	modules_file_type=$(file "${local_modules}")
-	cp ${local_modules} modules.tar.
+	#cp ${local_modules} modules.tar.
 fi
