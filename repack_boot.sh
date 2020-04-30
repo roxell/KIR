@@ -87,6 +87,8 @@ case ${TARGET} in
 		cat "${LXC_KERNEL_FILE}" "${LXC_DTB_FILE}" > zImage+dtb
 		echo "This is not an initrd">initrd.img
 
+		# NFS_SERVER_IP and NFS_ROOTFS exported from the environment.
+		echo ${NFS_SERVER_IP} and ${NFS_ROOTFS}
 		nfscmdline="root=/dev/nfs rw nfsroot=$NFS_SERVER_IP:$NFS_ROOTFS,nfsvers=3 ip=dhcp"
 		console_cmdline="console=tty0 console=ttyMSM0,115200n8"
 		cmdline_extra=""
