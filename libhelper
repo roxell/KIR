@@ -52,9 +52,9 @@ curl_me() {
 	echo $(basename "${local_file}")
 }
 
-get_mountpoint_dir() {
-	local local_mount_point_dir="$(mktemp -p "$(pwd)" -d -t kcv_"$(date +%y%m%d_%H%M%S)"-XXXXXXXXXX)"
-	echo "${local_mount_point_dir}"
+get_unpacked_dir() {
+	local local_unpacked_dir="$(mktemp -p "$(pwd)" -d -t kcv_"$(date +%y%m%d_%H%M%S)"-XXXXXXXXXX)"
+	echo "${local_unpacked_dir}"
 }
 
 get_new_file_name() {
@@ -73,11 +73,14 @@ get_new_size() {
 	echo "${local_new_size}"
 }
 
-get_and_create_a_ddfile() {
+get_and_create_image() {
 	local local_new_file_name=${1}
 	local local_new_size=${2}
-	dd if=/dev/zero of="${local_new_file_name}" bs=1M count=60 seek="${local_new_size}"
-	mkfs.ext4 "${local_new_file_name}"
+	#truncate -s "${local_new_size}"M "${local_new_file_name}"
+	#dd if=/dev/zero of="${local_new_file_name}" bs=1M count=60 seek="${local_new_size}"
+	#mkfs.ext4 "${local_new_file_name}"
+	guestfish -N fs:ext4:434M -m /dev/sda1 <<_EOF_
+_EOF_
 }
 
 get_and_create_new_rootfs() {
@@ -97,11 +100,28 @@ loopback_mount() {
 	mount -o loop "${local_new_file_name}" "${local_mount_point_dir}"
 }
 
+virt_make_fs() {
+	local local_rootfs_file=${1}
+	local local_new_size=${2}
+	guestfish -N ${local_rootfs_file}=fs:ext4:"${local_new_size}"M -m /dev/sda1 <<_EOF_
+_EOF_
+	file ${local_rootfs_file}
+	parted ${local_rootfs_file} p
+}
+
+add_rootfs() {
+	local local_rootfs_file=${1}
+	local local_new_file_name=${2}
+	local local_new_size=${3}
+	virt-make-fs --size=${local_new_size}M --type=ext4 ${local_rootfs_file} ${local_new_file_name}
+	file ${local_new_file_name}
+	parted ${local_new_file_name} p
+}
+
 virt_copy_in() {
 	local local_new_file_name=${1}
 	local local_mount_point_dir=${2}
 	virt-copy-in -a ${local_new_file_name} ${local_mount_point_dir}/* /
-	rm -rf "${local_mount_point_dir}"
 }
 
 create_a_sparse_img() {

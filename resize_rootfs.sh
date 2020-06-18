@@ -6,7 +6,6 @@ set -e
 
 EXTRA_SIZE=${EXTRA_SIZE:-64000}
 sparse_needed=0
-clear_modules=0
 zip_needed=0
 
 . $(dirname $0)/libhelper
@@ -26,9 +25,6 @@ usage() {
 
 while getopts "cd:f:hm:o:sz" arg; do
 	case $arg in
-	c)
-		clear_modules=1
-		;;
 	f)
 		LXC_ROOTFS_URL="$OPTARG"
 		;;
@@ -49,43 +45,37 @@ while getopts "cd:f:hm:o:sz" arg; do
 done
 
 
-LXC_OVERLAY_FILE=$(curl_me "${LXC_OVERLAY_URL}")
 LXC_ROOTFS_FILE=$(curl_me "${LXC_ROOTFS_URL}")
 
-overlay_file_type=$(file "${LXC_OVERLAY_FILE}")
 rootfs_file_type=$(file "${LXC_ROOTFS_FILE}")
-overlay_size=$(find_extracted_size "${LXC_OVERLAY_FILE}" "${overlay_file_type}")
 rootfs_size=$(find_extracted_size "${LXC_ROOTFS_FILE}" "${rootfs_file_type}")
 
-mount_point_dir=$(get_mountpoint_dir)
+if [[ -n ${LXC_OVERLAY_URL} ]]; then
+	LXC_OVERLAY_FILE=$(curl_me "${LXC_OVERLAY_URL}")
+	overlay_file_type=$(file "${LXC_OVERLAY_FILE}")
+	overlay_size=$(find_extracted_size "${LXC_OVERLAY_FILE}" "${overlay_file_type}")
+else
+	overlay_size=0
+fi
 
-echo ${mount_point_dir}
+unpacked_dir=$(get_unpacked_dir)
 
-new_file_name=$(get_new_file_name "${LXC_ROOTFS_FILE}" ".new.rootfs")
+echo ${unpacked_dir}
+
+new_file_name=$(get_new_file_name "${LXC_ROOTFS_FILE}" ".new.rootfs.img")
 new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
 if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	get_and_create_a_ddfile "${new_file_name}" "${new_size}"
+	#virt_make_fs "${new_file_name}" "${new_size}"
+	add_rootfs "${LXC_ROOTFS_FILE}" "${new_file_name}" "${new_size}"
+	if [[ -n ${LXC_OVERLAY_FILE} ]]; then
+		add_rootfs "${LXC_OVERLAY_FILE}" "${new_file_name}"
+	fi
 else
 	new_file_name=$(basename "${LXC_ROOTFS_FILE}" .gz)
 	get_and_create_new_rootfs "${LXC_ROOTFS_FILE}" "${new_file_name}" "${new_size}"
+	unpack_tar_file "${LXC_OVERLAY_FILE}" "${unpacked_dir}"
+	virt_copy_in ${new_file_name} ${mount_point_dir}
 fi
-
-if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	unpack_tar_file "${LXC_ROOTFS_FILE}" "${mount_point_dir}"
-fi
-
-if [[ $clear_modules -eq 1 ]]; then
-	rm -rf "${mount_point_dir}"/lib/modules/*
-fi
-unpack_tar_file "${LXC_OVERLAY_FILE}" "${mount_point_dir}"
-
-if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	cd "${mount_point_dir}"
-	tar -cJf ../"${new_file_name}".tar.xz .
-	cd ..
-fi
-
-virt_copy_in ${new_file_name} ${mount_point_dir}
 
 if [[ ${sparse_needed} -eq 1 ]]; then
 	img_file="$(basename "${new_file_name}" .ext4).img"
