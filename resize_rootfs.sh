@@ -53,9 +53,9 @@ rootfs_file_type=$(file "${LXC_ROOTFS_FILE}")
 overlay_size=$(find_extracted_size "${LXC_OVERLAY_FILE}" "${overlay_file_type}")
 rootfs_size=$(find_extracted_size "${LXC_ROOTFS_FILE}" "${rootfs_file_type}")
 
-mount_point_dir=$(get_mountpoint_dir)
+unpacked_dir=$(get_unpacked_dir)
 
-echo ${mount_point_dir}
+echo ${unpacked_dir}
 
 new_file_name=$(get_new_file_name "${LXC_ROOTFS_FILE}" ".new.rootfs")
 new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
@@ -67,18 +67,18 @@ else
 fi
 
 if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	unpack_tar_file "${LXC_ROOTFS_FILE}" "${mount_point_dir}"
+	unpack_tar_file "${LXC_ROOTFS_FILE}" "${unpacked_dir}"
 fi
 
-unpack_tar_file "${LXC_OVERLAY_FILE}" "${mount_point_dir}"
+unpack_tar_file "${LXC_OVERLAY_FILE}" "${unpacked_dir}"
 
 if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	cd "${mount_point_dir}"
+	cd "${unpacked_dir}"
 	tar -cJf ../"${new_file_name}".tar.xz .
 	cd ..
 fi
 
-virt_copy_in ${new_file_name} ${mount_point_dir}
+virt_copy_in ${new_file_name} ${unpacked_dir}
 
 if [[ ${sparse_needed} -eq 1 ]]; then
 	img_file="$(basename "${new_file_name}" .ext4).img"

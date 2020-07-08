@@ -114,7 +114,7 @@ case ${TARGET} in
 		rootfs_file_type=$(file "${LXC_ROOTFS_FILE}")
 		modules_size=$(find_extracted_size "${LXC_MODULES_FILE}" "${modules_file_type}")
 		rootfs_size=$(find_extracted_size "${LXC_ROOTFS_FILE}" "${rootfs_file_type}")
-		mount_point_dir=$(get_mountpoint_dir)
+		unpacked_dir=$(get_unpacked_dir)
 		new_file_name=$(get_new_file_name "${LXC_ROOTFS_FILE}" ".new.rootfs")
 		new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
 		if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
@@ -125,15 +125,15 @@ case ${TARGET} in
 		fi
 
 		if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-			unpack_tar_file "${LXC_ROOTFS_FILE}" "${mount_point_dir}"
+			unpack_tar_file "${LXC_ROOTFS_FILE}" "${unpacked_dir}"
 		fi
 
-		unpack_tar_file "${LXC_MODULES_FILE}" "${mount_point_dir}"
+		unpack_tar_file "${LXC_MODULES_FILE}" "${unpacked_dir}"
 
-		mkdir -p "${mount_point_dir}"/boot
-		cp "${LXC_DTB_FILE}" "${mount_point_dir}"/boot/
-		cp "${LXC_KERNEL_FILE}" "${mount_point_dir}"/boot/
-		cd "${mount_point_dir}"/boot
+		mkdir -p "${unpacked_dir}"/boot
+		cp "${LXC_DTB_FILE}" "${unpacked_dir}"/boot/
+		cp "${LXC_KERNEL_FILE}" "${unpacked_dir}"/boot/
+		cd "${unpacked_dir}"/boot
 
 		if [[ ${TARGET} = *"hikey"* ]]; then
 			dtb_file="hi6220-hikey.dtb"
@@ -151,7 +151,7 @@ case ${TARGET} in
 		fi
 		cd -
 
-		virt_copy_in ${new_file_name} ${mount_point_dir}
+		virt_copy_in ${new_file_name} ${unpacked_dir}
 		img_file="$(basename "${new_file_name}" .ext4).img"
 		create_a_sparse_img "${img_file}" "${new_file_name}"
 		;;

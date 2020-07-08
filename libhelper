@@ -31,8 +31,8 @@ find_extracted_size() {
 
 unpack_tar_file() {
 	local local_file=${1}
-	local local_mount_point=${2}
-	tar -xvf ${local_file} -C ${local_mount_point}
+	local local_unpacked=${2}
+	tar -xvf ${local_file} -C ${local_unpacked}
 }
 
 curl_me() {
@@ -52,9 +52,9 @@ curl_me() {
 	echo $(basename "${local_file}")
 }
 
-get_mountpoint_dir() {
-	local local_mount_point_dir="$(mktemp -p "$(pwd)" -d -t kcv_"$(date +%y%m%d_%H%M%S)"-XXXXXXXXXX)"
-	echo "${local_mount_point_dir}"
+get_unpacked_dir() {
+	local local_unpacked_dir="$(mktemp -p "$(pwd)" -d -t kcv_"$(date +%y%m%d_%H%M%S)"-XXXXXXXXXX)"
+	echo "${local_unpacked_dir}"
 }
 
 get_new_file_name() {
@@ -93,15 +93,15 @@ get_and_create_new_rootfs() {
 
 loopback_mount() {
 	local local_new_file_name=${1}
-	local local_mount_point_dir=${2}
-	mount -o loop "${local_new_file_name}" "${local_mount_point_dir}"
+	local local_unpacked_dir=${2}
+	mount -o loop "${local_new_file_name}" "${local_unpacked_dir}"
 }
 
 virt_copy_in() {
 	local local_new_file_name=${1}
-	local local_mount_point_dir=${2}
-	virt-copy-in -a ${local_new_file_name} ${local_mount_point_dir}/* /
-	rm -rf "${local_mount_point_dir}"
+	local local_unpacked_dir=${2}
+	virt-copy-in -a ${local_new_file_name} ${local_unpacked_dir}/* /
+	rm -rf "${local_unpacked_dir}"
 }
 
 create_a_sparse_img() {
