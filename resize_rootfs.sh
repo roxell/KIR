@@ -6,7 +6,6 @@ set -e
 
 EXTRA_SIZE=${EXTRA_SIZE:-64000}
 sparse_needed=0
-clear_modules=0
 zip_needed=0
 
 . $(dirname $0)/libhelper
@@ -24,11 +23,8 @@ usage() {
 	echo -e "   -h, prints out this help"
 }
 
-while getopts "cd:f:hm:o:sz" arg; do
+while getopts "d:f:hm:o:sz" arg; do
 	case $arg in
-	c)
-		clear_modules=1
-		;;
 	f)
 		LXC_ROOTFS_URL="$OPTARG"
 		;;
@@ -74,9 +70,6 @@ if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
 	unpack_tar_file "${LXC_ROOTFS_FILE}" "${mount_point_dir}"
 fi
 
-if [[ $clear_modules -eq 1 ]]; then
-	rm -rf "${mount_point_dir}"/lib/modules/*
-fi
 unpack_tar_file "${LXC_OVERLAY_FILE}" "${mount_point_dir}"
 
 if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
