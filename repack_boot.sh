@@ -6,7 +6,6 @@ set -e
 
 . $(dirname $0)/libhelper
 
-clear_modules=0
 zip_needed=0
 nfsrootfs=0
 EXTRA_SIZE=${EXTRA_SIZE:-64000}
@@ -28,11 +27,8 @@ usage() {
 	echo -e "   -h, prints out this help"
 }
 
-while getopts "cd:f:hk:m:nt:z" arg; do
+while getopts "d:f:hk:m:nt:z" arg; do
 	case $arg in
-	c)
-		clear_modules=1
-		;;
 	d)
 		LXC_DTB_URL="$OPTARG"
 		;;
@@ -132,9 +128,6 @@ case ${TARGET} in
 			unpack_tar_file "${LXC_ROOTFS_FILE}" "${mount_point_dir}"
 		fi
 
-		if [[ $clear_modules -eq 1 ]]; then
-			rm -rf "${mount_point_dir}"/lib/modules/*
-		fi
 		unpack_tar_file "${LXC_MODULES_FILE}" "${mount_point_dir}"
 
 		mkdir -p "${mount_point_dir}"/boot
