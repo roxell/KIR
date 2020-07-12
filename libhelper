@@ -97,11 +97,19 @@ loopback_mount() {
 	mount -o loop "${local_new_file_name}" "${local_unpacked_dir}"
 }
 
+add_rootfs() {
+	local local_rootfs_file=${1}
+	local local_new_file_name=${2}
+	local local_new_size=${3}
+	virt-make-fs --size=${local_new_size}M --type=ext4 ${local_rootfs_file} ${local_new_file_name}
+	file ${local_new_file_name}
+	parted ${local_new_file_name} p
+}
+
 virt_copy_in() {
 	local local_new_file_name=${1}
 	local local_unpacked_dir=${2}
 	virt-copy-in -a ${local_new_file_name} ${local_unpacked_dir}/* /
-	rm -rf "${local_unpacked_dir}"
 }
 
 create_a_sparse_img() {

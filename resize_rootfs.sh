@@ -45,40 +45,36 @@ while getopts "d:f:hm:o:sz" arg; do
 done
 
 
-LXC_OVERLAY_FILE=$(curl_me "${LXC_OVERLAY_URL}")
 LXC_ROOTFS_FILE=$(curl_me "${LXC_ROOTFS_URL}")
 
-overlay_file_type=$(file "${LXC_OVERLAY_FILE}")
 rootfs_file_type=$(file "${LXC_ROOTFS_FILE}")
-overlay_size=$(find_extracted_size "${LXC_OVERLAY_FILE}" "${overlay_file_type}")
 rootfs_size=$(find_extracted_size "${LXC_ROOTFS_FILE}" "${rootfs_file_type}")
+
+if [[ -n ${LXC_OVERLAY_URL} ]]; then
+	LXC_OVERLAY_FILE=$(curl_me "${LXC_OVERLAY_URL}")
+	overlay_file_type=$(file "${LXC_OVERLAY_FILE}")
+	overlay_size=$(find_extracted_size "${LXC_OVERLAY_FILE}" "${overlay_file_type}")
+else
+	overlay_size=0
+fi
 
 unpacked_dir=$(get_unpacked_dir)
 
 echo ${unpacked_dir}
 
-new_file_name=$(get_new_file_name "${LXC_ROOTFS_FILE}" ".new.rootfs")
+new_file_name=$(get_new_file_name "${LXC_ROOTFS_FILE}" ".new.rootfs.img")
 new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
 if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	get_and_create_a_ddfile "${new_file_name}" "${new_size}"
+	add_rootfs "${LXC_ROOTFS_FILE}" "${new_file_name}" "${new_size}"
+	if [[ -n ${LXC_OVERLAY_FILE} ]]; then
+		add_rootfs "${LXC_OVERLAY_FILE}" "${new_file_name}"
+	fi
 else
 	new_file_name=$(basename "${LXC_ROOTFS_FILE}" .gz)
 	get_and_create_new_rootfs "${LXC_ROOTFS_FILE}" "${new_file_name}" "${new_size}"
+	unpack_tar_file "${LXC_OVERLAY_FILE}" "${unpacked_dir}"
+	virt_copy_in ${new_file_name} ${unpacked_dir}
 fi
-
-if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	unpack_tar_file "${LXC_ROOTFS_FILE}" "${unpacked_dir}"
-fi
-
-unpack_tar_file "${LXC_OVERLAY_FILE}" "${unpacked_dir}"
-
-if [[ "${LXC_ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	cd "${unpacked_dir}"
-	tar -cJf ../"${new_file_name}".tar.xz .
-	cd ..
-fi
-
-virt_copy_in ${new_file_name} ${unpacked_dir}
 
 if [[ ${sparse_needed} -eq 1 ]]; then
 	img_file="$(basename "${new_file_name}" .ext4).img"
