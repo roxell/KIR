@@ -92,7 +92,7 @@ case ${TARGET} in
 
 		case ${TARGET} in
 			dragonboard-410c)
-				cmdline="root=/dev/mmcblk0p14 rw rootwait ${console_cmdline}"
+				cmdline="root=/dev/mmcblk0p10 rw rootwait ${console_cmdline}"
 				pagasize=2048
 				;;
 			dragonboard-845c)
