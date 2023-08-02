@@ -106,7 +106,7 @@ case ${TARGET} in
 				;;
 			dragonboard-845c)
 				cmdline_extra="clk_ignore_unused pd_ignore_unused"
-				cmdline="root=PARTLABEL=rootfs rw rootwait ${console_cmdline} ${cmdline_extra}"
+				cmdline="root=PARTLABEL=rootfs rw rootwait ${console_cmdline} ${cmdline_extra} kvm-arm.mode=protected"
 				pagasize=4096
 				;;
 		esac
