@@ -78,7 +78,7 @@ case ${TARGET} in
 			gunzip ${KERNEL_FILE}
 			KERNEL_FILE=$(echo "${KERNEL_FILE}" | cut -d'.' -f1)
 		fi
-		cmdline="rw androidboot.hardware=exynos850 androidboot.selinux=permissive buildvariant=eng"
+		cmdline="rw androidboot.hardware=exynos850 androidboot.selinux=permissive buildvariant=eng kvm-arm.mode=protected"
 		mkbootimg --kernel "${KERNEL_FILE}" --cmdline "${cmdline}" --os_version 10 --os_patch_level 2019-12-01 --tags_offset 0 --header_version 2 --dtb "${DTB_FILE}" --dtb_offset 0 --output boot.img
 		file boot.img
 		;;
