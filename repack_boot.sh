@@ -82,7 +82,7 @@ case ${TARGET} in
 		mkbootimg --kernel "${KERNEL_FILE}" --cmdline "${cmdline}" --os_version 10 --os_patch_level 2019-12-01 --tags_offset 0 --header_version 2 --dtb "${DTB_FILE}" --dtb_offset 0 --output boot.img
 		file boot.img
 		;;
-	dragonboard-410c|dragonboard-845c|qrb5165-rb5)
+	dragonboard-410c|dragonboard-820c|dragonboard-845c|qrb5165-rb5)
 		if [[ ! ${kernel_file_type} = *"gzip compressed data"* ]]; then
 			echo "Need to pass in a zImage file."
 			echo "gzip -c Image > zImage"
@@ -103,6 +103,10 @@ case ${TARGET} in
 			dragonboard-410c)
 				cmdline="root=/dev/mmcblk0p14 rw rootwait ${console_cmdline}"
 				pagasize=2048
+				;;
+			dragonboard-820c)
+				cmdline="root=/dev/disk/by-partlabel/rootfs rw rootwait ${console_cmdline} ${cmdline_extra}"
+				pagasize=4096
 				;;
 			dragonboard-845c)
 				cmdline_extra="clk_ignore_unused pd_ignore_unused"
