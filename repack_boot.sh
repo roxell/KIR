@@ -105,6 +105,7 @@ case ${TARGET} in
 				pagasize=2048
 				;;
 			dragonboard-820c)
+				cmdline_extra="ignore_loglevel earlycon"
 				cmdline="root=/dev/disk/by-partlabel/rootfs rw rootwait ${console_cmdline} ${cmdline_extra}"
 				pagasize=4096
 				;;
