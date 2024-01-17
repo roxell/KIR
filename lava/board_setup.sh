@@ -35,7 +35,7 @@ case ${DEVICE_TYPE} in
 		echo "PRINTOUT DTB: ${local_dtb}"
 		file ${local_dtb}
 		machine=${DEVICE_TYPE}
-		${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}"
+		${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}" -m "${local_modules}"
 		${kir}/resize_rootfs.sh -s -f "${local_rootfs}" -o "${local_modules}"
 		;;
 	nfs-dragonboard-845c)
