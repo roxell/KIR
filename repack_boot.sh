@@ -111,7 +111,7 @@ case ${TARGET} in
 				;;
 			dragonboard-845c)
 				cmdline_extra="clk_ignore_unused pd_ignore_unused"
-				cmdline="root=PARTLABEL=rootfs rw rootwait ${console_cmdline} ${cmdline_extra}"
+				cmdline="rw rootwait ${console_cmdline} ${cmdline_extra}"
 				pagasize=4096
 				;;
 			qrb5165-rb5)
