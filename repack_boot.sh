@@ -94,7 +94,7 @@ case ${TARGET} in
 		mkdir modules_dir
 		unpack_tar_file "${MODULES_FILE}" modules_dir
 		cd modules_dir
-		find . -type f -name '*qcom*' | cpio -o -H newc | gzip -9 > ../modules.cpio.gz
+		find . | cpio -o -H newc | gzip -9 > ../modules.cpio.gz
 		cd -
 		echo "This is not an initrd">initrd.img
 
