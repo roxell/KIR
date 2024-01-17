@@ -96,6 +96,15 @@ case ${TARGET} in
 		cd modules_dir
 		find . | cpio -o -H newc | gzip -9 > ../modules.cpio.gz
 		cd -
+		mount_point_dir=$(get_mountpoint_dir)
+		new_file_name=$(get_new_file_name "${ROOTFS_FILE}" ".new.rootfs")
+		new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
+		new_file_name=$(basename "${ROOTFS_FILE}" .gz)
+		get_and_create_new_rootfs "${ROOTFS_FILE}" "${new_file_name}" "${new_size}"
+		cd "${mount_point_dir}"
+		find . | cpio -o -H newc | gzip -9 > ../rootfs.cpio.gz
+		cd -
+		cat rootfs.cpio.gz modules.cpio.gz > final.cpio.gz
 		echo "This is not an initrd">initrd.img
 
 		# NFS_SERVER_IP and NFS_ROOTFS exported from the environment.
@@ -125,7 +134,7 @@ case ${TARGET} in
 		fi
 
 		new_file_name="$(find . -type f -name "${KERNEL_FILE}"| awk -F'.' '{print $2}'|sed 's|/||g')"
-		mkbootimg --kernel zImage+dtb --ramdisk modules.cpio.gz --pagesize "${pagasize}" --base 0x80000000 --cmdline "${cmdline}" --output boot.img
+		mkbootimg --kernel zImage+dtb --ramdisk final.cpio.gz --pagesize "${pagasize}" --base 0x80000000 --cmdline "${cmdline}" --output boot.img
 		file boot.img
 		;;
 	am57xx-evm|hikey)
