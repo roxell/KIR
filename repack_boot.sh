@@ -91,8 +91,8 @@ case ${TARGET} in
 		fi
 
 		cat "${KERNEL_FILE}" "${DTB_FILE}" > zImage+dtb
-		mkdir modules_dir
-		unpack_tar_file "${MODULES_FILE}" modules_dir
+		mkdir -p modules_dir/usr
+		unpack_tar_file "${MODULES_FILE}" modules_dir/usr
 		cd modules_dir
 		find . | cpio -o -H newc -R +0:+0 | gzip -9 > ../modules.cpio.gz
 		cd -
