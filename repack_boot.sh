@@ -112,7 +112,7 @@ case ${TARGET} in
 				;;
 			dragonboard-845c)
 				#cmdline_extra="clk_ignore_unused pd_ignore_unused"
-				cmdline="${console_cmdline} ${cmdline_extra}"
+				cmdline="init=/sbin/init ${console_cmdline} ${cmdline_extra}"
 				pagasize=4096
 				;;
 			qrb5165-rb5)
