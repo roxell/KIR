@@ -111,8 +111,8 @@ case ${TARGET} in
 				pagasize=2048
 				;;
 			dragonboard-845c)
-				cmdline_extra="clk_ignore_unused pd_ignore_unused"
-				cmdline="rw rootwait ${console_cmdline} ${cmdline_extra}"
+				#cmdline_extra="clk_ignore_unused pd_ignore_unused"
+				cmdline="${console_cmdline} ${cmdline_extra}"
 				pagasize=4096
 				;;
 			qrb5165-rb5)
