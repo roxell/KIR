@@ -94,7 +94,7 @@ case ${TARGET} in
 		mkdir modules_dir
 		unpack_tar_file "${MODULES_FILE}" modules_dir
 		cd modules_dir
-		find . | cpio -o -H newc | gzip -9 > ../modules.cpio.gz
+		find . | cpio -o -H newc -R +0:+0 | gzip -9 > ../modules.cpio.gz
 		cd -
 		curl -sSL https://snapshots.linaro.org/member-builds/qcomlt/boards/qcom-armv8a/openembedded/master/56008/rpb/initramfs-rootfs-image-qcom-armv8a.rootfs-20240118001247-92260.cpio.gz -o initramfs.cpio.gz
 		cat initramfs.cpio.gz modules.cpio.gz > final-initrd.cpio.gz
