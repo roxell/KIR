@@ -96,7 +96,8 @@ case ${TARGET} in
 		cd modules_dir
 		find . | cpio -o -H newc | gzip -9 > ../modules.cpio.gz
 		cd -
-		echo "This is not an initrd">initrd.img
+		curl -sSL https://snapshots.linaro.org/member-builds/qcomlt/boards/qcom-armv8a/openembedded/master/56008/rpb/initramfs-rootfs-image-qcom-armv8a.rootfs-20240118001247-92260.cpio.gz -o initramfs.cpio.gz
+		cat initramfs.cpio.gz modules.cpio.gz > final-initrd.cpio.gz
 
 		# NFS_SERVER_IP and NFS_ROOTFS exported from the environment.
 		echo ${NFS_SERVER_IP} and ${NFS_ROOTFS}
@@ -125,7 +126,7 @@ case ${TARGET} in
 		fi
 
 		new_file_name="$(find . -type f -name "${KERNEL_FILE}"| awk -F'.' '{print $2}'|sed 's|/||g')"
-		mkbootimg --kernel zImage+dtb --ramdisk modules.cpio.gz --pagesize "${pagasize}" --base 0x80000000 --cmdline "${cmdline}" --output boot.img
+		mkbootimg --kernel zImage+dtb --ramdisk final-initrd.cpio.gz --pagesize "${pagasize}" --base 0x80000000 --cmdline "${cmdline}" --output boot.img
 		file boot.img
 		;;
 	am57xx-evm|hikey)
