@@ -79,6 +79,15 @@ if [[ ${dtb_file_type} =~ *"Device Tree Blob"* ]]; then
 fi
 
 case ${TARGET} in
+	nfsrootfs)
+		mkdir -p modules_dir/usr
+		unpack_tar_file "${MODULES_FILE}" modules_dir/usr
+		cd modules_dir
+		find . | cpio -o -H newc -R +0:+0 | gzip -9 > ../modules.cpio.gz
+		cd -
+		cat "${INITRD_FILE}" modules.cpio.gz > final-initrd.cpio.gz
+		initrd_filename="final-initrd.cpio.gz"
+		;;
 	e850-96)
 		if [[ ${kernel_file_type} = *"gzip compressed data"* ]]; then
 			gunzip ${KERNEL_FILE}

@@ -25,6 +25,10 @@ echo "PRINTOUT ROOTFS: ${local_rootfs}"
 file ${local_rootfs}
 
 case ${DEVICE_TYPE} in
+	nfsrootfs)
+		local_dtb=$(find . -type f -name '*.dtb')
+		${kir}/repack_boot.sh -t "${DEVICE_TYPE}" -d "${local_dtb}" -k "${local_kernel}" -m "${local_modules}" -i "${local_initrd}"
+		;;
 	x15)
 		local_dtb=$(find . -type f -name '*.dtb')
 		echo "PRINTOUT DTB: ${local_dtb}"
