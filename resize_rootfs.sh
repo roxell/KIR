@@ -46,12 +46,14 @@ while getopts "cd:f:hm:o:sz" arg; do
 done
 
 
-OVERLAY_FILE=$(curl_me "${OVERLAY_URL}")
-ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
+if [[ -n "${OVERLAY_URL}" ]]; then
+	OVERLAY_FILE=$(curl_me "${OVERLAY_URL}")
+	overlay_file_type=$(file "${OVERLAY_FILE}")
+	overlay_size=$(find_extracted_size "${OVERLAY_FILE}" "${overlay_file_type}")
+fi
 
-overlay_file_type=$(file "${OVERLAY_FILE}")
+ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
 rootfs_file_type=$(file "${ROOTFS_FILE}")
-overlay_size=$(find_extracted_size "${OVERLAY_FILE}" "${overlay_file_type}")
 rootfs_size=$(find_extracted_size "${ROOTFS_FILE}" "${rootfs_file_type}")
 
 mount_point_dir=$(get_mountpoint_dir)
@@ -74,7 +76,10 @@ fi
 if [[ $clear_modules -eq 1 ]]; then
 	rm -rf "${mount_point_dir}"/lib/modules/*
 fi
-unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
+
+if [[ -n "${OVERLAY_URL}" ]]; then
+	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
+fi
 
 if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
 	cd "${mount_point_dir}"
