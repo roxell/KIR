@@ -38,7 +38,7 @@ case ${DEVICE_TYPE} in
 		file ${local_dtb}
 		machine=${DEVICE_TYPE}
 		case ${DEVICE_TYPE} in
-			dragonboard-410c|dragonboard-845c)
+			dragonboard-410c|dragonboard-845c|qrb5165-rb5)
 				if [[ -n "${COPY_MODULES}" ]]; then
 					copy_modules="-r"
 				fi
