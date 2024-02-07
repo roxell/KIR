@@ -109,6 +109,13 @@ case ${TARGET} in
 
 		case ${TARGET} in
 			dragonboard-410c)
+				mkdir -p modules_dir/usr
+				unpack_tar_file "${MODULES_FILE}" modules_dir/usr
+				cd modules_dir
+				find . | cpio -o -H newc -R +0:+0 | gzip -9 > ../modules.cpio.gz
+				cd -
+				cat "${INITRD_FILE}" modules.cpio.gz > final-initrd.cpio.gz
+				initrd_filename="final-initrd.cpio.gz"
 				cmdline="root=/dev/mmcblk0p14 rw rootwait ${console_cmdline}"
 				pagasize=2048
 				;;
