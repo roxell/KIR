@@ -92,6 +92,8 @@ if [[ -n "${OVERLAY_URL}" ]]; then
 	fi
 
 	virt_copy_in ${new_file_name} ${mount_point_dir}
+else
+	new_file_name="${ROOTFS_FILE}"
 fi
 
 if [[ ${sparse_needed} -eq 1 ]]; then
