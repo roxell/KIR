@@ -46,48 +46,49 @@ while getopts "cd:f:hm:o:sz" arg; do
 done
 
 
+ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
+
 if [[ -n "${OVERLAY_URL}" ]]; then
 	OVERLAY_FILE=$(curl_me "${OVERLAY_URL}")
 	overlay_file_type=$(file "${OVERLAY_FILE}")
 	overlay_size=$(find_extracted_size "${OVERLAY_FILE}" "${overlay_file_type}")
-fi
 
-ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
-rootfs_file_type=$(file "${ROOTFS_FILE}")
-rootfs_size=$(find_extracted_size "${ROOTFS_FILE}" "${rootfs_file_type}")
+	rootfs_file_type=$(file "${ROOTFS_FILE}")
+	rootfs_size=$(find_extracted_size "${ROOTFS_FILE}" "${rootfs_file_type}")
 
-mount_point_dir=$(get_mountpoint_dir)
+	mount_point_dir=$(get_mountpoint_dir)
 
-echo ${mount_point_dir}
+	echo ${mount_point_dir}
 
-new_file_name=$(get_new_file_name "${ROOTFS_FILE}" ".new.rootfs")
-new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
-if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	get_and_create_a_ddfile "${new_file_name}" "${new_size}"
-else
-	new_file_name=$(basename "${ROOTFS_FILE}" .gz)
-	get_and_create_new_rootfs "${ROOTFS_FILE}" "${new_file_name}" "${new_size}"
-fi
+	new_file_name=$(get_new_file_name "${ROOTFS_FILE}" ".new.rootfs")
+	new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
+	if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
+		get_and_create_a_ddfile "${new_file_name}" "${new_size}"
+	else
+		new_file_name=$(basename "${ROOTFS_FILE}" .gz)
+		get_and_create_new_rootfs "${ROOTFS_FILE}" "${new_file_name}" "${new_size}"
+	fi
 
-if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	unpack_tar_file "${ROOTFS_FILE}" "${mount_point_dir}"
-fi
+	if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
+		unpack_tar_file "${ROOTFS_FILE}" "${mount_point_dir}"
+	fi
 
-if [[ $clear_modules -eq 1 ]]; then
-	rm -rf "${mount_point_dir}"/lib/modules/*
-fi
+	if [[ $clear_modules -eq 1 ]]; then
+		rm -rf "${mount_point_dir}"/lib/modules/*
+	fi
 
-if [[ -n "${OVERLAY_URL}" ]]; then
 	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
-fi
 
-if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	cd "${mount_point_dir}"
-	tar -cJf ../"${new_file_name}".tar.xz .
-	cd ..
-fi
+	if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
+		cd "${mount_point_dir}"
+		tar -cJf ../"${new_file_name}".tar.xz .
+		cd ..
+	fi
 
-virt_copy_in ${new_file_name} ${mount_point_dir}
+	virt_copy_in ${new_file_name} ${mount_point_dir}
+else
+	new_file_name="${ROOTFS_FILE}"
+fi
 
 if [[ ${sparse_needed} -eq 1 ]]; then
 	img_file="$(basename "${new_file_name}" .ext4).img"
