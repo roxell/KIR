@@ -39,7 +39,10 @@ case ${DEVICE_TYPE} in
 		machine=${DEVICE_TYPE}
 		case ${DEVICE_TYPE} in
 			dragonboard-845c)
-				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}" -m "${local_modules}" -i "${local_initrd}"
+				if [[ -n "${COPY_MODULES}" ]]; then
+					copy_modules="-r"
+				fi
+				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}" -m "${local_modules}" -i "${local_initrd}" "${copy_modules}"
 				;;
 			*)
 				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}"
