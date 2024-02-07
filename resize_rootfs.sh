@@ -1,6 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
 
+set -x
+
 EXTRA_SIZE=${EXTRA_SIZE:-64000}
 sparse_needed=0
 clear_modules=0
@@ -54,7 +56,6 @@ fi
 
 ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
 rootfs_file_type=$(file "${ROOTFS_FILE}")
-rootfs_size=$(find_extracted_size "${ROOTFS_FILE}" "${rootfs_file_type}")
 new_file_name=$(get_new_file_name "${ROOTFS_FILE}" ".new.rootfs")
 
 if [[ -n "${OVERLAY_URL}" ]]; then
@@ -63,6 +64,7 @@ if [[ -n "${OVERLAY_URL}" ]]; then
 
 	echo ${mount_point_dir}
 
+	rootfs_size=$(find_extracted_size "${ROOTFS_FILE}" "${rootfs_file_type}")
 	new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
 	if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
 		get_and_create_a_ddfile "${new_file_name}" "${new_size}"
