@@ -22,12 +22,13 @@ usage() {
 	echo -e "      Can be to a file on disk: file:///path/to/file.gz"
 	echo -e "   -m MODULE_URL, specify a url to a kernel module tgz file."
 	echo -e "      Can be to a file on disk: file:///path/to/file.gz"
+	echo -e "   -r set cmdline root= partition"
 	echo -e "   -t TARGET, add machine name"
 	echo -e "   -z zip image or not"
 	echo -e "   -h, prints out this help"
 }
 
-while getopts "cd:f:hi:k:m:nt:z" arg; do
+while getopts "cd:f:hi:k:m:nr:t:z" arg; do
 	case $arg in
 	c)
 		clear_modules=1
@@ -49,6 +50,9 @@ while getopts "cd:f:hi:k:m:nt:z" arg; do
 		;;
 	n)
 		nfsrootfs=1
+		;;
+	r)
+		cmdline_root="$OPTARG"
 		;;
 	t)
 		TARGET="$OPTARG"
@@ -121,7 +125,10 @@ case ${TARGET} in
 				cat "${INITRD_FILE}" modules.cpio.gz > final-initrd.cpio.gz
 				initrd_filename="final-initrd.cpio.gz"
 				cmdline_extra="clk_ignore_unused pd_ignore_unused"
-				cmdline="root=/dev/sda1 init=/sbin/init rw ${console_cmdline} ${cmdline_extra} -- "
+				if [[ -z "${cmdline_root}" ]]; then
+					cmdline_root="/dev/sda1"
+				fi
+				cmdline="root=${cmdline_root} init=/sbin/init rw ${console_cmdline} ${cmdline_extra} -- "
 				pagasize=4096
 				;;
 			qrb5165-rb5)
