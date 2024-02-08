@@ -39,16 +39,14 @@ case ${DEVICE_TYPE} in
 		machine=${DEVICE_TYPE}
 		case ${DEVICE_TYPE} in
 			dragonboard-410c|dragonboard-845c|qrb5165-rb5)
-				if [[ -n "${COPY_MODULES}" ]]; then
-					copy_modules="-r"
-				fi
-				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}" -m "${local_modules}" -i "${local_initrd}" "${copy_modules}"
+				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}" -m "${local_modules}" -i "${local_initrd}"
+				${kir}/resize_rootfs.sh -s -f "${local_rootfs}"
 				;;
 			*)
 				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}"
+				${kir}/resize_rootfs.sh -s -f "${local_rootfs}" -o "${local_modules}"
 				;;
 		esac
-		${kir}/resize_rootfs.sh -s -f "${local_rootfs}"
 		;;
 	nfs-dragonboard-845c)
 
