@@ -118,7 +118,7 @@ case ${TARGET} in
 				cd modules_dir
 				find . | cpio -o -H newc -R +0:+0 | gzip -9 > ../modules.cpio.gz
 				cd -
-				cat "${INITRD_FILE}" modules.cpio.gz > final-initrd.cpio.gz
+				cat "${INITRD_FILE}" > final-initrd.cpio.gz
 				initrd_filename="final-initrd.cpio.gz"
 				cmdline_extra="clk_ignore_unused pd_ignore_unused"
 				cmdline="root=/dev/sda1 init=/sbin/init rw ${console_cmdline} ${cmdline_extra} -- "
