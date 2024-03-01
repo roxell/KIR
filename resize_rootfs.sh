@@ -82,6 +82,7 @@ else
 	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
 fi
 ls -l "${mount_point_dir}"
+ls -l "${mount_point_dir}/usr/"
 
 if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
 	cd "${mount_point_dir}"
