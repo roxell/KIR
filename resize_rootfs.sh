@@ -81,6 +81,7 @@ if [[ "${OVERLAY_FILE}" =~ modules* ]]; then
 else
 	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
 fi
+ls -l "${mount_point_dir}"
 
 if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
 	cd "${mount_point_dir}"
