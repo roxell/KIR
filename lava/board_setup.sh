@@ -19,7 +19,10 @@ echo "PRINTOUT KERNEL: ${local_kernel}"
 file ${local_kernel}
 local_rootfs=$(find . -type f -name "*${ROOTFS_STRING}*.ext4*")||true
 if [[ -z ${local_rootfs} ]]; then
-	local_rootfs=$(find . -type f -name "*${ROOTFS_STRING}*.tar*")
+	local_rootfs=$(find . -type f -name "*${ROOTFS_STRING}*.raw*")||true
+	if [[ -z ${local_rootfs} ]]; then
+		local_rootfs=$(find . -type f -name "*${ROOTFS_STRING}*.tar*")
+	fi
 fi
 echo "PRINTOUT ROOTFS: ${local_rootfs}"
 file ${local_rootfs}
