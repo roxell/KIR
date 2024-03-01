@@ -74,7 +74,13 @@ fi
 if [[ $clear_modules -eq 1 ]]; then
 	rm -rf "${mount_point_dir}"/lib/modules/*
 fi
-unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
+
+if [[ "${OVERLAY_FILE}" =~ modules* ]]; then
+	mkdir -p "${mount_point_dir}/usr/"
+	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}/usr/"
+else
+	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
+fi
 
 if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
 	cd "${mount_point_dir}"
