@@ -8,6 +8,8 @@ DEVICE_TYPE=${1}
 ROOTFS_STRING=${2:-"image-"}
 kir=$(dirname $0)/..
 
+OVERLAY_MODULES_TO_USR="${OVERLAY_MODULES_TO_USR:-"false"}"
+
 echo "PRINTOUT"
 local_initrd=$(find . -type f -name '*initramfs*')
 echo "PRINTOUT initramfs: ${local_initrd}"
@@ -45,7 +47,7 @@ case ${DEVICE_TYPE} in
 				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}"
 				;;
 		esac
-		${kir}/resize_rootfs.sh -s -f "${local_rootfs}" -o "${local_modules}"
+		${kir}/resize_rootfs.sh -s -f "${local_rootfs}" -o "${local_modules}" -l "${OVERLAY_MODULES_TO_USR}"
 		;;
 	nfs-dragonboard-845c)
 

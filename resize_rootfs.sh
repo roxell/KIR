@@ -5,6 +5,7 @@ EXTRA_SIZE=${EXTRA_SIZE:-64000}
 sparse_needed=0
 clear_modules=0
 zip_needed=0
+overlay_to_usr="false"
 
 . $(dirname $0)/libhelper
 
@@ -19,15 +20,19 @@ usage() {
 	echo -e "   -s SPARSE image or not"
 	echo -e "   -z zip image or not"
 	echo -e "   -h, prints out this help"
+	echo -e "   -l, Overlay modules into /usr/"
 }
 
-while getopts "cd:f:hm:o:sz" arg; do
+while getopts "cd:f:hlo:sz" arg; do
 	case $arg in
 	c)
 		clear_modules=1
 		;;
 	f)
 		ROOTFS_URL="$OPTARG"
+		;;
+	l)
+		overlay_to_usr="$OPTARG"
 		;;
 	o)
 		OVERLAY_URL="$OPTARG"
@@ -74,7 +79,13 @@ fi
 if [[ $clear_modules -eq 1 ]]; then
 	rm -rf "${mount_point_dir}"/lib/modules/*
 fi
-unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
+
+if [[ "${overlay_to_usr}" =~ *rue ]]; then
+	mkdir -p "${mount_point_dir}/usr/"
+	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}/usr/"
+else
+	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
+fi
 
 if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
 	cd "${mount_point_dir}"
