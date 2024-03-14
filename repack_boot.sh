@@ -34,18 +34,23 @@ while getopts "cd:f:hi:k:m:nt:z" arg; do
 		;;
 	d)
 		DTB_URL="$OPTARG"
+		DTB_FILE=$(curl_me "${DTB_URL}")
 		;;
 	f)
 		ROOTFS_URL="$OPTARG"
+		ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
 		;;
 	i)
 		INITRD_URL="$OPTARG"
+		INITRD_FILE=$(curl_me "${INITRD_URL}")
 		;;
 	k)
 		KERNEL_URL="$OPTARG"
+		KERNEL_FILE=$(curl_me "${KERNEL_URL}")
 		;;
 	m)
 		MODULES_URL="$OPTARG"
+		MODULES_FILE=$(curl_me "${MODULES_URL}")
 		;;
 	n)
 		nfsrootfs=1
@@ -64,11 +69,6 @@ while getopts "cd:f:hi:k:m:nt:z" arg; do
 done
 
 
-ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
-INITRD_FILE=$(curl_me "${INITRD_URL}")
-MODULES_FILE=$(curl_me "${MODULES_URL}")
-KERNEL_FILE=$(curl_me "${KERNEL_URL}")
-DTB_FILE=$(curl_me "${DTB_URL}")
 
 kernel_file_type=$(file "${KERNEL_FILE}")
 dtb_file_type=$(file "${DTB_FILE}")

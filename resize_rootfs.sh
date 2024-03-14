@@ -30,12 +30,14 @@ while getopts "cd:f:hlo:sz" arg; do
 		;;
 	f)
 		ROOTFS_URL="$OPTARG"
+		ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
 		;;
 	l)
 		overlay_to_usr="$OPTARG"
 		;;
 	o)
 		OVERLAY_URL="$OPTARG"
+		OVERLAY_FILE=$(curl_me "${OVERLAY_URL}")
 		;;
 	s)
 		sparse_needed=1
@@ -51,49 +53,50 @@ while getopts "cd:f:hlo:sz" arg; do
 done
 
 
-OVERLAY_FILE=$(curl_me "${OVERLAY_URL}")
-ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
-
-overlay_file_type=$(file "${OVERLAY_FILE}")
-rootfs_file_type=$(file "${ROOTFS_FILE}")
-overlay_size=$(find_extracted_size "${OVERLAY_FILE}" "${overlay_file_type}")
-rootfs_size=$(find_extracted_size "${ROOTFS_FILE}" "${rootfs_file_type}")
-
-mount_point_dir=$(get_mountpoint_dir)
-
-echo ${mount_point_dir}
-
-new_file_name=$(get_new_file_name "${ROOTFS_FILE}" ".new.rootfs")
-new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
-if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	get_and_create_a_ddfile "${new_file_name}" "${new_size}"
+if [[ -n ${OVERLAY_FILE} ]]; then
+	overlay_file_type=$(file "${OVERLAY_FILE}")
+	rootfs_file_type=$(file "${ROOTFS_FILE}")
+	overlay_size=$(find_extracted_size "${OVERLAY_FILE}" "${overlay_file_type}")
+	rootfs_size=$(find_extracted_size "${ROOTFS_FILE}" "${rootfs_file_type}")
+	
+	mount_point_dir=$(get_mountpoint_dir)
+	
+	echo ${mount_point_dir}
+	
+	new_file_name=$(get_new_file_name "${ROOTFS_FILE}" ".new.rootfs")
+	new_size=$(get_new_size "${overlay_size}" "${rootfs_size}" "${EXTRA_SIZE}")
+	if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
+		get_and_create_a_ddfile "${new_file_name}" "${new_size}"
+	else
+		new_file_name=$(basename "${ROOTFS_FILE}" .gz)
+		get_and_create_new_rootfs "${ROOTFS_FILE}" "${new_file_name}" "${new_size}"
+	fi
+	
+	if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
+		unpack_tar_file "${ROOTFS_FILE}" "${mount_point_dir}"
+	fi
+	
+	if [[ $clear_modules -eq 1 ]]; then
+		rm -rf "${mount_point_dir}"/lib/modules/*
+	fi
+	
+	if [[ "${overlay_to_usr}" =~ *rue ]]; then
+		mkdir -p "${mount_point_dir}/usr/"
+		unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}/usr/"
+	else
+		unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
+	fi
+	
+	if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
+		cd "${mount_point_dir}"
+		tar -cJf ../"${new_file_name}".tar.xz .
+		cd ..
+	fi
+	
+	virt_copy_in ${new_file_name} ${mount_point_dir}
 else
-	new_file_name=$(basename "${ROOTFS_FILE}" .gz)
-	get_and_create_new_rootfs "${ROOTFS_FILE}" "${new_file_name}" "${new_size}"
+	new_file_name="${ROOTFS_FILE}"
 fi
-
-if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	unpack_tar_file "${ROOTFS_FILE}" "${mount_point_dir}"
-fi
-
-if [[ $clear_modules -eq 1 ]]; then
-	rm -rf "${mount_point_dir}"/lib/modules/*
-fi
-
-if [[ "${overlay_to_usr}" =~ *rue ]]; then
-	mkdir -p "${mount_point_dir}/usr/"
-	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}/usr/"
-else
-	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}"
-fi
-
-if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
-	cd "${mount_point_dir}"
-	tar -cJf ../"${new_file_name}".tar.xz .
-	cd ..
-fi
-
-virt_copy_in ${new_file_name} ${mount_point_dir}
 
 if [[ ${sparse_needed} -eq 1 ]]; then
 	img_file="$(basename "${new_file_name}" .ext4).img"
