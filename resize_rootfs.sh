@@ -1,5 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
+set -e
 
 EXTRA_SIZE=${EXTRA_SIZE:-64000}
 sparse_needed=0
