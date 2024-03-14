@@ -47,7 +47,8 @@ case ${DEVICE_TYPE} in
 				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}"
 				;;
 		esac
-		${kir}/resize_rootfs.sh -s -f "${local_rootfs}" -o "${local_modules}" -l "${OVERLAY_MODULES_TO_USR}"
+		#${kir}/resize_rootfs.sh -s -f "${local_rootfs}" -o "${local_modules}" -l "${OVERLAY_MODULES_TO_USR}"
+		${kir}/resize_rootfs.sh -s -f "${local_rootfs}"
 		;;
 	nfs-dragonboard-845c)
 
