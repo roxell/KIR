@@ -15,7 +15,7 @@ local_initrd=$(find . -type f -name '*initramfs*')
 echo "PRINTOUT initramfs: ${local_initrd}"
 local_modules=$(find . -type f -name '*modules*')
 echo "PRINTOUT MODULES: ${local_modules}"
-file ${local_modules}
+#file ${local_modules}
 local_kernel=$(find . -type f -name '*Image*' | grep -vi dtb)
 echo "PRINTOUT KERNEL: ${local_kernel}"
 file ${local_kernel}
