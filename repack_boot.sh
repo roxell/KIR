@@ -109,8 +109,10 @@ case ${TARGET} in
 
 		case ${TARGET} in
 			dragonboard-410c)
-				cmdline="root=/dev/mmcblk0p14 rw rootwait ${console_cmdline}"
+				cmdline="root=/dev/mmcblk0p14 debug=y rw rootwait ${console_cmdline}"
 				pagasize=2048
+				cat "${INITRD_FILE}" > final-initrd.cpio.gz
+				initrd_filename="final-initrd.cpio.gz"
 				;;
 			dragonboard-845c)
 				#mkdir -p modules_dir/usr

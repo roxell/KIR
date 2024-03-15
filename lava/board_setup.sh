@@ -40,7 +40,7 @@ case ${DEVICE_TYPE} in
 		file ${local_dtb}
 		machine=${DEVICE_TYPE}
 		case ${DEVICE_TYPE} in
-			dragonboard-845c)
+			dragonboard-410c|dragonboard-845c)
 				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}" -i "${local_initrd}"
 				;;
 			*)
