@@ -123,7 +123,7 @@ case ${TARGET} in
 				cat "${INITRD_FILE}" > final-initrd.cpio.gz
 				initrd_filename="final-initrd.cpio.gz"
 				cmdline_extra="clk_ignore_unused pd_ignore_unused"
-				cmdline="rootfstype=ext4 noresume debug=y rw ${console_cmdline} ${cmdline_extra} -- "
+				cmdline="root=UUID=b6f7ac4c-7174-4d91-9c44-9422dae74a37 rootfstype=ext4 noresume debug=y rw ${console_cmdline} ${cmdline_extra} -- "
 				pagasize=4096
 				;;
 			qrb5165-rb5)
