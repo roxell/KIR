@@ -124,6 +124,7 @@ case ${TARGET} in
 				initrd_filename="final-initrd.cpio.gz"
 				cmdline_extra="clk_ignore_unused pd_ignore_unused"
 				cmdline="rootfstype=ext4 noresume debug=y rw ${console_cmdline} ${cmdline_extra} -- "
+				cmdline="root=/dev/sda1 init=/sbin/init rw ${console_cmdline} ${cmdline_extra} -- "
 				pagasize=4096
 				;;
 			qrb5165-rb5)
