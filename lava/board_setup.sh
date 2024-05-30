@@ -11,9 +11,9 @@ kir=$(dirname $0)/..
 echo "PRINTOUT"
 local_initrd=$(find . -type f -name '*initramfs*')
 echo "PRINTOUT initramfs: ${local_initrd}"
-local_modules=$(find . -type f -name '*modules*')
-echo "PRINTOUT MODULES: ${local_modules}"
-file ${local_modules}
+#local_modules=$(find . -type f -name '*modules*')
+#echo "PRINTOUT MODULES: ${local_modules}"
+#file ${local_modules}
 local_kernel=$(find . -type f -name '*Image*' | grep -vi dtb)
 echo "PRINTOUT KERNEL: ${local_kernel}"
 file ${local_kernel}
@@ -39,7 +39,7 @@ case ${DEVICE_TYPE} in
 		machine=${DEVICE_TYPE}
 		case ${DEVICE_TYPE} in
 			dragonboard-845c)
-				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}" -m "${local_modules}" -i "${local_initrd}"
+				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}" -i "${local_initrd}"
 				;;
 			*)
 				${kir}/repack_boot.sh -t "${machine}" -d "${local_dtb}" -k "${local_kernel}"
