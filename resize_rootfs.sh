@@ -49,12 +49,16 @@ while getopts "cd:f:hm:o:p:sz" arg; do
 done
 
 
-OVERLAY_FILE=$(curl_me "${OVERLAY_URL}")
-ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
+if [[ -n ${OVERLAY_URL} ]]; then
+	OVERLAY_FILE=$(curl_me "${OVERLAY_URL}")
+	overlay_file_type=$(file "${OVERLAY_FILE}")
+	overlay_size=$(find_extracted_size "${OVERLAY_FILE}" "${overlay_file_type}")
+else
+	overlay_size=0
+fi
 
-overlay_file_type=$(file "${OVERLAY_FILE}")
+ROOTFS_FILE=$(curl_me "${ROOTFS_URL}")
 rootfs_file_type=$(file "${ROOTFS_FILE}")
-overlay_size=$(find_extracted_size "${OVERLAY_FILE}" "${overlay_file_type}")
 rootfs_size=$(find_extracted_size "${ROOTFS_FILE}" "${rootfs_file_type}")
 
 mount_point_dir=$(get_mountpoint_dir)
@@ -74,11 +78,13 @@ if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
 	unpack_tar_file "${ROOTFS_FILE}" "${mount_point_dir}"
 fi
 
-if [[ $clear_modules -eq 1 ]]; then
-	rm -rf "${mount_point_dir}"/lib/modules/*
+if [[ -n ${OVERLAY_URL} ]]; then
+	if [[ $clear_modules -eq 1 ]]; then
+		rm -rf "${mount_point_dir}"/lib/modules/*
+	fi
+	mkdir -p "${mount_point_dir}${MODULES_PATH}"
+	unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}${MODULES_PATH}"
 fi
-mkdir -p "${mount_point_dir}${MODULES_PATH}"
-unpack_tar_file "${OVERLAY_FILE}" "${mount_point_dir}${MODULES_PATH}"
 
 if [[ "${ROOTFS_FILE}" =~ ^.*.tar* ]]; then
 	cd "${mount_point_dir}"
