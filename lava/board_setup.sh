@@ -7,10 +7,11 @@ set -e
 DEVICE_TYPE=${1}
 ROOTFS_STRING=${2:-"image-"}
 MODULES_PATH=${3:-"/"}
+INITRAMFS_STRING=${INITRAMFS_STRING:-"initramfs"}
 kir=$(dirname $0)/..
 
 echo "PRINTOUT"
-local_initrd=$(find . -type f -name '*initramfs*')
+local_initrd=$(find . -type f -name "*${INITRAMFS_STRING}*")
 echo "PRINTOUT initramfs: ${local_initrd}"
 local_modules=$(find . -type f -name '*modules*')
 echo "PRINTOUT MODULES: ${local_modules}"
@@ -54,6 +55,11 @@ case ${DEVICE_TYPE} in
 				${kir}/resize_rootfs.sh -s -f "${local_rootfs}" -o "${local_modules}" -p "${MODULES_PATH}"
 				;;
 		esac
+		;;
+	oe-dragonboard-845c)
+
+		mv local_initrd=boot.img
+		${kir}/resize_rootfs.sh -s -f "${local_rootfs}"
 		;;
 	nfs-dragonboard-845c)
 
