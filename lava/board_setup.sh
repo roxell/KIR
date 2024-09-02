@@ -1,8 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
 
-set -e
-#set -xe
+#set -e
+set -xe
 
 DEVICE_TYPE=${1}
 ROOTFS_STRING=${2:-"image-"}
